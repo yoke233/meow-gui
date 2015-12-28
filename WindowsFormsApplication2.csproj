@@ -108,34 +108,8 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Image1.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\network-connect.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\network-disconnect.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\flag.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\document-share.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\tools-report-bug.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\view-list-text.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\list-add.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Earth_Globe_128px_1186620_easyicon.net.ico" />
     <Content Include="Newtonsoft.Json.dll" />
-    <None Include="Resources\ic_signal_wifi_statusbar_not_connected_black_26x24dp.png" />
-    <None Include="Resources\ic_cached_black_24dp.png" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">
@@ -148,6 +122,9 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

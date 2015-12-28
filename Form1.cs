@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.NetworkInformation;
+using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -19,12 +20,15 @@ namespace WindowsFormsApplication2
             InitializeComponent();
         }
 
+        int conf_threadnum = 30;
+        int conf_waittime = 2000;
+        string conf_exefile = @"proxy_yoke";
+
         Process p;
         ProcessStartInfo s;
         Thread thread;
         JsonConfig configX;
         int currect_connect = -1;
-        string exefile = @"proxy_yoke";
         string init_server = "";
         string rc_path = @"rc.txt";
         string config_path = @"gui-config.json";
@@ -79,7 +83,7 @@ namespace WindowsFormsApplication2
         {
             try
             {
-                Process[] proc = Process.GetProcessesByName(exefile);
+                Process[] proc = Process.GetProcessesByName(conf_exefile);
                 for (int i = 0; i < proc.Length; i++)
                 {
                     proc[i].Kill();
@@ -100,7 +104,7 @@ namespace WindowsFormsApplication2
             }
             try
             {
-                s.FileName = exefile;
+                s.FileName = conf_exefile;
                 p = Process.Start(s);
                 while (!p.StandardOutput.EndOfStream)
                 {
@@ -145,7 +149,7 @@ namespace WindowsFormsApplication2
             {
                 JsonSerializer serializer = new JsonSerializer();
                 configX = (JsonConfig)serializer.Deserialize(reader, typeof(JsonConfig));
-                exefile = configX.exec;
+                conf_exefile = configX.exefile;
                 this.dataGridView1.DataSource = configX.configs;
 
                 for (int i = 0; i < configX.configs.Count; i++)
@@ -220,19 +224,95 @@ namespace WindowsFormsApplication2
 
         private void startPing()
         {
-            Thread thread = new Thread(new ThreadStart(_pingThread));
-            thread.IsBackground = true;
-            thread.Start();
-        }
+            ThreadPool.SetMaxThreads(conf_threadnum, conf_threadnum);
 
-        private void _pingThread()
-        {
             for (int i = 0; i < configX.configs.Count; i++)
             {
+                ThreadPool.QueueUserWorkItem(_pingThread,i);
+            }
+            /*
+            Thread thread = new Thread(new ThreadStart(_pingThread));
+            thread.IsBackground = true;
+            thread.Start();*/
+        }
+
+        public static string Hostname2ip(string hostname)
+        {
+            try
+            {
+                IPAddress ip;
+                if (IPAddress.TryParse(hostname, out ip))
+                    return ip.ToString();
+                else
+                    return Dns.GetHostEntry(hostname).AddressList[0].ToString();
+            }
+            catch (Exception)
+            {
+                throw new Exception("IP Address Error");
+            }
+        }
+
+        private void _pingThread(object state)
+        {
+            int i = (int)state;
+            try
+            {
+                IPAddress ip = IPAddress.Parse(Hostname2ip(configX.configs[i].server));
+                IPEndPoint point = new IPEndPoint(ip, configX.configs[i].server_port);
+
+                Socket sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                    int t = Environment.TickCount;
+                    IAsyncResult connresult = sock.BeginConnect(point, new AsyncCallback(Connect), i);
+                    if (connresult.AsyncWaitHandle.WaitOne(conf_waittime, false))
+                    {
+                        int t2 = Environment.TickCount;
+                        configX.configs[i].aaa = (t2-t)+ "ms";
+                        sock.Close();
+                    }
+                    else
+                    {
+                        sock.Close();
+                        configX.configs[i].aaa = "-";
+                    }
+                }
+                catch (Exception)
+                {
+                    configX.configs[i].aaa = "-";
+                    Console.WriteLine(configX.configs[i].server+"---Error");
+                }
+                finally
+                {
+
+                    dataGridView1.UpdateCellValue(4, i);
+                }
+                /*
                 Ping ping = new Ping();
                 ping.PingCompleted += Ping_PingCompleted;
                 string _ipAddress = configX.configs[i].server;
-                ping.SendAsync(_ipAddress, 5000, i);
+                ping.SendAsync(_ipAddress, 5000, i);*/
+        }
+
+        void Connect(IAsyncResult iar)
+        {
+            try
+            {
+                if (iar.IsCompleted)
+                {
+                    configX.configs[(int)iar.AsyncState].aaa = "-";
+                }
+                else
+                {
+                    configX.configs[(int)iar.AsyncState].aaa = "ms";
+                }
+                dataGridView1.UpdateCellValue(4, (int)iar.AsyncState);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+            finally
+            {
+
             }
         }
 
@@ -325,7 +405,7 @@ namespace WindowsFormsApplication2
                 "https://www.shadowsu.com/clientarea.php?action=productdetails&id=484");
 
             JsonConfig configY = new JsonConfig();
-            configY.exec = configX.exec;
+            configY.exefile = configX.exefile;
             configY.user = configX.user;
             configY.pass = configX.pass;
             configY.configs = new List<JsonConfigItem>();

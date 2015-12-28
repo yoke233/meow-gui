@@ -59,25 +59,5 @@ namespace WindowsFormsApplication2.Properties {
                 resourceCulture = value;
             }
         }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        internal static System.Drawing.Bitmap ic_cached_black_24dp {
-            get {
-                object obj = ResourceManager.GetObject("ic_cached_black_24dp", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        internal static System.Drawing.Bitmap ic_signal_wifi_statusbar_not_connected_black_26x24dp {
-            get {
-                object obj = ResourceManager.GetObject("ic_signal_wifi_statusbar_not_connected_black_26x24dp", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
     }
 }

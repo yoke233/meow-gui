@@ -9,7 +9,8 @@ namespace WindowsFormsApplication2
 {
     class JsonConfig
     {
-        public string exec { get; set; }
+        public int watetime { get; set; }
+        public string exefile { get; set; }
         public string user { get; set; }
         public string pass { get; set; }
         public IList<JsonConfigItem> configs { get; set; }
