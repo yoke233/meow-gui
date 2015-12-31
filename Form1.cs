@@ -283,26 +283,6 @@ namespace WindowsFormsApplication2
 
         void Connect(IAsyncResult iar)
         {
-            try
-            {
-                if (iar.IsCompleted)
-                {
-                    configX.configs[(int)iar.AsyncState].aaa = "-";
-                }
-                else
-                {
-                    configX.configs[(int)iar.AsyncState].aaa = "ms";
-                }
-                dataGridView1.UpdateCellValue(4, (int)iar.AsyncState);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.ToString());
-            }
-            finally
-            {
-
-            }
         }
 
         private void Ping_PingCompleted(object sender, PingCompletedEventArgs e)
