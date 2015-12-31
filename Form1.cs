@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -9,6 +8,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Web.Script.Serialization;
 using System.Windows.Forms;
 
 namespace WindowsFormsApplication2
@@ -36,7 +36,7 @@ namespace WindowsFormsApplication2
         private void Form1_Load(object sender, EventArgs e)
         {
 
-            this.notifyIcon1.ShowBalloonTip(500, "yoke_ss", "I am here...", ToolTipIcon.Info);
+            //this.notifyIcon1.ShowBalloonTip(500, "yoke_ss", "I am here...", ToolTipIcon.Info);
 
             s = new ProcessStartInfo();
             s.RedirectStandardInput = true;
@@ -48,12 +48,20 @@ namespace WindowsFormsApplication2
             try
             {
                 getNow();
+            }
+            catch (Exception e2)
+            {
+                SetText(e2.StackTrace);
+            }
+
+            try
+            {
                 loadConfig();
                 startProxy();
             }
             catch (Exception e2)
             {
-                Console.WriteLine(e2);
+                SetText(e2.StackTrace);
             }
         }
 
@@ -91,7 +99,7 @@ namespace WindowsFormsApplication2
             }
             catch (Exception e2)
             {
-                Console.WriteLine(e2);
+                SetText(e2.StackTrace);
             }
         }
 
@@ -143,12 +151,10 @@ namespace WindowsFormsApplication2
         private void loadConfig()
         {
 
-            //this.listView1.BeginUpdate();   //数据更新，UI暂时挂起，直到EndUpdate绘制控件，可以有效避免闪烁并大大提高加载速度
-
             using (StreamReader reader = File.OpenText(config_path))
             {
-                JsonSerializer serializer = new JsonSerializer();
-                configX = (JsonConfig)serializer.Deserialize(reader, typeof(JsonConfig));
+                JavaScriptSerializer serializer = new JavaScriptSerializer();
+                configX = (JsonConfig)serializer.Deserialize(reader.ReadToEnd(), typeof(JsonConfig));
                 conf_exefile = configX.exefile;
                 this.dataGridView1.DataSource = configX.configs;
 
@@ -160,21 +166,8 @@ namespace WindowsFormsApplication2
                         currect_connect = i;
                         item.bbb = "已连接";
                     }
-                    /*Console.WriteLine(item);
-
-                    ListViewItem lvi = new ListViewItem();
-                    lvi.Text = item.remarks;
-                    lvi.Tag = item;
-                    lvi.SubItems.Add(item.server.Trim());
-                    lvi.SubItems.Add("");
-                    lvi.SubItems.Add("");
-                    this.listView1.Items.Add(lvi);*/
                 }
             }
-            /*
-            this.listView1.EndUpdate();  //结束数据处理，UI界面一次性绘制。
-            this.listView1.ListViewItemSorter = new ListViewColumnSorter();
-            */
         }
 
         private void toolStripMenuItem1_Click(object sender, EventArgs e)
@@ -230,10 +223,6 @@ namespace WindowsFormsApplication2
             {
                 ThreadPool.QueueUserWorkItem(_pingThread,i);
             }
-            /*
-            Thread thread = new Thread(new ThreadStart(_pingThread));
-            thread.IsBackground = true;
-            thread.Start();*/
         }
 
         public static string Hostname2ip(string hostname)
@@ -421,7 +410,7 @@ namespace WindowsFormsApplication2
                 match = coll[i];
                 JsonConfigItem item = new JsonConfigItem();
                 item.server = match.Groups[3].Value;
-                item.name = match.Groups[2].Value;
+                item.remarks = match.Groups[2].Value;
                 item.method = match.Groups[5].Value;
                 item.server_port = Int32.Parse(server_port);
                 item.password = password;
@@ -433,9 +422,15 @@ namespace WindowsFormsApplication2
 
             using (StreamWriter file = File.CreateText(config_path))
             {
-                JsonSerializer serializer = new JsonSerializer();
-                serializer.Serialize(file, configY);
+                JavaScriptSerializer serializer = new JavaScriptSerializer();
+                String jsonStr = serializer.Serialize(configY);
+                SetText(jsonStr);
+                file.Write(jsonStr);
             }
+
+            SetText(".................download config ok..................");
+
+            loadConfig();
 
         }
 
@@ -496,14 +491,14 @@ namespace WindowsFormsApplication2
                 request.AllowAutoRedirect = false;
 
                 // 提交请求数据
-                System.IO.Stream outputStream = request.GetRequestStream();
+                Stream outputStream = request.GetRequestStream();
                 outputStream.Write(postData, 0, postData.Length);
                 outputStream.Close();
 
                 // 接收返回的页面
                 response = request.GetResponse() as HttpWebResponse;
                 responseStream = response.GetResponseStream();
-                reader = new System.IO.StreamReader(responseStream, Encoding.UTF8);
+                reader = new StreamReader(responseStream, Encoding.UTF8);
                 srcString = reader.ReadToEnd();
 
                 ///////////////////////////////////////////////////
