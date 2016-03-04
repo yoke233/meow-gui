@@ -122,6 +122,11 @@ namespace WindowsFormsApplication2
                 p.WaitForExit();
                 p.Close();
             }
+            catch (InvalidOperationException e1)
+            {
+                SetText(e1.StackTrace);
+
+            }
             catch (Exception e2)
             {
                 Console.WriteLine(e2);
@@ -150,23 +155,29 @@ namespace WindowsFormsApplication2
 
         private void loadConfig()
         {
-
-            using (StreamReader reader = File.OpenText(config_path))
+            try
             {
-                JavaScriptSerializer serializer = new JavaScriptSerializer();
-                configX = (JsonConfig)serializer.Deserialize(reader.ReadToEnd(), typeof(JsonConfig));
-                conf_exefile = configX.exefile;
-                this.dataGridView1.DataSource = configX.configs;
-
-                for (int i = 0; i < configX.configs.Count; i++)
+                using (StreamReader reader = File.OpenText(config_path))
                 {
-                    JsonConfigItem item = configX.configs[i];
-                    if (item.server.Equals(init_server))
+                    JavaScriptSerializer serializer = new JavaScriptSerializer();
+                    configX = (JsonConfig)serializer.Deserialize(reader.ReadToEnd(), typeof(JsonConfig));
+                    conf_exefile = configX.exefile;
+                    this.dataGridView1.DataSource = configX.configs;
+
+                    for (int i = 0; i < configX.configs.Count; i++)
                     {
-                        currect_connect = i;
-                        item.bbb = "已连接";
+                        JsonConfigItem item = configX.configs[i];
+                        if (item.server.Equals(init_server))
+                        {
+                            currect_connect = i;
+                            item.bbb = "已连接";
+                        }
                     }
                 }
+            }
+            catch (Exception e2)
+            {
+                Console.WriteLine(e2);
             }
         }
 
@@ -221,7 +232,7 @@ namespace WindowsFormsApplication2
 
             for (int i = 0; i < configX.configs.Count; i++)
             {
-                ThreadPool.QueueUserWorkItem(_pingThread,i);
+                ThreadPool.QueueUserWorkItem(_pingThread, i);
             }
         }
 
@@ -250,35 +261,36 @@ namespace WindowsFormsApplication2
                 IPEndPoint point = new IPEndPoint(ip, configX.configs[i].server_port);
 
                 Socket sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                    int t = Environment.TickCount;
-                    IAsyncResult connresult = sock.BeginConnect(point, new AsyncCallback(Connect), i);
-                    if (connresult.AsyncWaitHandle.WaitOne(conf_waittime, false))
-                    {
-                        int t2 = Environment.TickCount;
-                        configX.configs[i].aaa = (t2-t)+ "ms";
-                        sock.Close();
-                    }
-                    else
-                    {
-                        sock.Close();
-                        configX.configs[i].aaa = "-";
-                    }
-                }
-                catch (Exception)
+                int t = Environment.TickCount;
+                IAsyncResult connresult = sock.BeginConnect(point, new AsyncCallback(Connect), i);
+                if (connresult.AsyncWaitHandle.WaitOne(conf_waittime, false))
                 {
+                    int t2 = Environment.TickCount;
+                    configX.configs[i].aaa = (t2 - t) + "ms";
+                    sock.Close();
+                }
+                else
+                {
+                    sock.Close();
                     configX.configs[i].aaa = "-";
-                    Console.WriteLine(configX.configs[i].server+"---Error");
                 }
-                finally
-                {
+            }
+            catch (Exception)
+            {
+                configX.configs[i].aaa = "-";
+                Console.WriteLine(configX.configs[i].server + "---Error");
+            }
+            finally
+            {
 
-                    dataGridView1.UpdateCellValue(4, i);
-                }
-                /*
-                Ping ping = new Ping();
+                dataGridView1.UpdateCellValue(4, i);
+            }
+            /*
+            Ping ping = new Ping();
                 ping.PingCompleted += Ping_PingCompleted;
                 string _ipAddress = configX.configs[i].server;
-                ping.SendAsync(_ipAddress, 5000, i);*/
+                ping.SendAsync(_ipAddress, 5000, i);
+            */
         }
 
         void Connect(IAsyncResult iar)
@@ -369,9 +381,9 @@ namespace WindowsFormsApplication2
             postParams.Add("password", configX.pass);
 
             string returnHtml = GetAspNetCodeResponseDataFromWebSite(postParams,
-                "https://www.shadowsu.com/clientarea.php",
-                "https://www.shadowsu.com/dologin.php",
-                "https://www.shadowsu.com/clientarea.php?action=productdetails&id=484");
+                "http://www.shadowsu.com/clientarea.php",
+                "http://www.shadowsu.com/dologin.php",
+                "http://www.shadowsu.com/clientarea.php?action=productdetails&id=484");
 
             JsonConfig configY = new JsonConfig();
             configY.exefile = configX.exefile;
@@ -385,7 +397,7 @@ namespace WindowsFormsApplication2
             string server_port = match.Groups[1].Value;
 
             MatchCollection coll = Regex.Matches(returnHtml, "<tr><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><td><a href=\"//[^\"]*\" target=\"_blank\">获取</a></td></tr>");
-            for(int i = 0; i < coll.Count; i++)
+            for (int i = 0; i < coll.Count; i++)
             {
                 match = coll[i];
                 JsonConfigItem item = new JsonConfigItem();
@@ -414,7 +426,7 @@ namespace WindowsFormsApplication2
 
         }
 
-        private string GetAspNetCodeResponseDataFromWebSite(Dictionary<string, string> postParams, 
+        private string GetAspNetCodeResponseDataFromWebSite(Dictionary<string, string> postParams,
             string getTokenUrl, string loginUrl, string getDataUrl)
         {
 
