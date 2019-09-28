@@ -8,6 +8,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Web;
 using System.Web.Script.Serialization;
 using System.Windows.Forms;
 
@@ -161,7 +162,6 @@ namespace WindowsFormsApplication2
                 {
                     JavaScriptSerializer serializer = new JavaScriptSerializer();
                     configX = (JsonConfig)serializer.Deserialize(reader.ReadToEnd(), typeof(JsonConfig));
-                    conf_exefile = configX.exefile;
                     this.dataGridView1.DataSource = configX.configs;
 
                     for (int i = 0; i < configX.configs.Count; i++)
@@ -376,58 +376,83 @@ namespace WindowsFormsApplication2
 
         private void getNewConfig()
         {
-            Dictionary<string, string> postParams = new Dictionary<string, string>();
-            postParams.Add("username", configX.user);
-            postParams.Add("password", configX.pass);
-
-            string returnHtml = GetAspNetCodeResponseDataFromWebSite(postParams,
-                "http://www.shadowsu.com/clientarea.php",
-                "http://www.shadowsu.com/dologin.php",
-                "http://www.shadowsu.com/clientarea.php?action=productdetails&id=484");
-
-            JsonConfig configY = new JsonConfig();
-            configY.exefile = configX.exefile;
-            configY.user = configX.user;
-            configY.pass = configX.pass;
-            configY.configs = new List<JsonConfigItem>();
-
-            Match match = Regex.Match(returnHtml, @"<td>密码</td><td>(.*)</td>");
-            string password = match.Groups[1].Value;
-            match = Regex.Match(returnHtml, @"<td>端口</td><td>(.*)</td>");
-            string server_port = match.Groups[1].Value;
-
-            MatchCollection coll = Regex.Matches(returnHtml, "<tr><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><td>([^<]*)</td><td><a href=\"//[^\"]*\" target=\"_blank\">获取</a></td></tr>");
-            for (int i = 0; i < coll.Count; i++)
+            try 
             {
-                match = coll[i];
-                JsonConfigItem item = new JsonConfigItem();
-                item.server = match.Groups[3].Value;
-                item.remarks = match.Groups[2].Value;
-                item.method = match.Groups[5].Value;
-                item.server_port = Int32.Parse(server_port);
-                item.password = password;
-                item.status = match.Groups[1].Value;
-                configY.configs.Add(item);
-            }
-            File.Delete(config_path + ".bak");
-            File.Move(config_path, config_path + ".bak");
+                IList<JsonConfigItem> configs = configX.configs;
+                for (int i = 0; i < configX.serverSubscribes.Count; i++)
+                {
+                    ServerSubscribe serverSubscribe = configX.serverSubscribes[i];
+                    string subscribe64Str = httpGet(serverSubscribe.URL);
+                    string subscribeStr = Base64Helper.Base64Decode(subscribe64Str);
+                    for (int w = configs.Count - 1; w >= 0; w--)
+                    {
+                        if (configs[w].group == serverSubscribe.Group)
+                            configs.Remove(configs[i]);
+                    }
+                    string[] list = subscribeStr.Split('\n');
+                    for(int j =0;i<list.Length;j++)
+                    {
+                        string str64 = list[j].Replace("ssr://", "");
+                        string one = Base64Helper.Base64Decode(str64);
+                        string[] arr = one.Split('/');
+                        if(arr.Length == 1)
+                        {
+                            break;
+                        }
+                        string[] serverConfig = arr[0].Split(':');
+                        Dictionary<string, string> param = ParseQueryString(arr[1]);
+                        JsonConfigItem item = new JsonConfigItem();
+                        item.server = serverConfig[0];
+                        item.server_port = Convert.ToInt32(serverConfig[1]);
+                        item.protocol = serverConfig[2];
+                        item.method = serverConfig[3];
+                        item.obfs = serverConfig[4];
+                        item.password = Base64Helper.Base64Decode(serverConfig[5]);
+                        item.obfsparam = Base64Helper.Base64Decode(param["obfsparam"]);
+                        item.protocolparam = Base64Helper.Base64Decode(param["protoparam"]);
+                        item.remarks = Base64Helper.Base64Decode(param["remarks"]);
+                        item.remarks_base64 = param["remarks"];
+                        item.group = Base64Helper.Base64Decode(param["group"]);
+                        configs.Add(item);
+                    }
+                }
 
-            using (StreamWriter file = File.CreateText(config_path))
+                using (StreamWriter file = File.CreateText(config_path))
+                {
+                    JavaScriptSerializer serializer = new JavaScriptSerializer();
+                    String jsonStr = serializer.Serialize(configX);
+                    SetText(jsonStr);
+                    file.Write(jsonStr);
+                }
+
+                SetText(".................download config ok..................");
+                
+                this.Invoke(new EventHandler(delegate
+                {
+                    loadConfig();
+                }));
+            }
+            catch (Exception e)
             {
-                JavaScriptSerializer serializer = new JavaScriptSerializer();
-                String jsonStr = serializer.Serialize(configY);
-                SetText(jsonStr);
-                file.Write(jsonStr);
+                SetText(e.StackTrace);
             }
-
-            SetText(".................download config ok..................");
-
-            loadConfig();
 
         }
 
-        private string GetAspNetCodeResponseDataFromWebSite(Dictionary<string, string> postParams,
-            string getTokenUrl, string loginUrl, string getDataUrl)
+        public Dictionary<string, string> ParseQueryString(String query)
+        {
+            Dictionary<String, String> queryDict = new Dictionary<string, string>();
+            foreach (String token in query.TrimStart(new char[] { '?' }).Split(new char[] { '&' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                string[] parts = token.Split(new char[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
+                if (parts.Length == 2)
+                    queryDict[parts[0].Trim()] = HttpUtility.UrlDecode(parts[1]).Trim();
+                else
+                    queryDict[parts[0].Trim()] = "";
+            }
+            return queryDict;
+        }
+        private string httpGet(string url)
         {
 
             try
@@ -438,7 +463,7 @@ namespace WindowsFormsApplication2
                 // 1.打开 MyLogin.aspx 页面，获得 GetVeiwState & EventValidation
                 ///////////////////////////////////////////////////                
                 // 设置打开页面的参数
-                HttpWebRequest request = WebRequest.Create(getTokenUrl) as HttpWebRequest;
+                HttpWebRequest request = WebRequest.Create(url) as HttpWebRequest;
                 request.Method = "GET";
                 request.KeepAlive = false;
 
@@ -446,72 +471,7 @@ namespace WindowsFormsApplication2
                 HttpWebResponse response = request.GetResponse() as HttpWebResponse;
                 System.IO.Stream responseStream = response.GetResponseStream();
                 System.IO.StreamReader reader = new System.IO.StreamReader(responseStream, Encoding.UTF8);
-                string srcString = reader.ReadToEnd();
-
-                // 获取页面的 token,分析返回的页面，解析出 token 的值          
-                string viewStateFlag = "id=\"token\" value=\"";
-                int i = srcString.IndexOf(viewStateFlag) + viewStateFlag.Length;
-                int j = srcString.IndexOf("\"", i);
-                string token = srcString.Substring(i, j - i);
-
-                postParams.Add("token", token);
-
-
-                ///////////////////////////////////////////////////
-                // 2.自动填充并提交 Login.aspx 页面，提交Login.aspx页面，来保存Cookie
-                ///////////////////////////////////////////////////
-
-
-                // 要提交的字符串数据。格式形如:user=uesr1&password=123
-                string postString = "";
-                foreach (KeyValuePair<string, string> de in postParams)
-                {
-                    //把提交按钮中的中文字符转换成url格式，以防中文或空格等信息
-                    postString += System.Web.HttpUtility.UrlEncode(de.Key.ToString()) + "=" + System.Web.HttpUtility.UrlEncode(de.Value.ToString()) + "&";
-                }
-
-                // 将提交的字符串数据转换成字节数组
-                byte[] postData = Encoding.ASCII.GetBytes(postString);
-
-                // 设置提交的相关参数
-                request = WebRequest.Create(loginUrl) as HttpWebRequest;
-                request.Method = "POST";
-                request.KeepAlive = false;
-                request.ContentType = "application/x-www-form-urlencoded";
-                request.CookieContainer = cookieContainer;
-                request.ContentLength = postData.Length;
-                request.AllowAutoRedirect = false;
-
-                // 提交请求数据
-                Stream outputStream = request.GetRequestStream();
-                outputStream.Write(postData, 0, postData.Length);
-                outputStream.Close();
-
-                // 接收返回的页面
-                response = request.GetResponse() as HttpWebResponse;
-                responseStream = response.GetResponseStream();
-                reader = new StreamReader(responseStream, Encoding.UTF8);
-                srcString = reader.ReadToEnd();
-
-                ///////////////////////////////////////////////////
-                // 3.打开需要抓取数据的页面
-                ///////////////////////////////////////////////////
-                // 设置打开页面的参数
-                request = WebRequest.Create(getDataUrl) as HttpWebRequest;
-                request.Method = "GET";
-                request.KeepAlive = false;
-                request.CookieContainer = cookieContainer;
-
-                // 接收返回的页面
-                response = request.GetResponse() as HttpWebResponse;
-                responseStream = response.GetResponseStream();
-                reader = new System.IO.StreamReader(responseStream, Encoding.UTF8);
-                srcString = reader.ReadToEnd();
-                return srcString;
-                ///////////////////////////////////////////////////
-                // 4.分析返回的页面
-                ///////////////////////////////////////////////////
-                // ...... ......
+                return reader.ReadToEnd();
             }
             catch (WebException we)
             {

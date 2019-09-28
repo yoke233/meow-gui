@@ -30,6 +30,8 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
@@ -69,31 +71,31 @@
             this.toolStripSeparator1,
             this.toolStripMenuItem3});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(101, 76);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(109, 82);
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(100, 22);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(108, 24);
             this.toolStripMenuItem1.Text = "显示";
             this.toolStripMenuItem1.Click += new System.EventHandler(this.toolStripMenuItem1_Click);
             // 
             // toolStripMenuItem2
             // 
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(100, 22);
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(108, 24);
             this.toolStripMenuItem2.Text = "隐藏";
             this.toolStripMenuItem2.Click += new System.EventHandler(this.toolStripMenuItem2_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(97, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(105, 6);
             // 
             // toolStripMenuItem3
             // 
             this.toolStripMenuItem3.Name = "toolStripMenuItem3";
-            this.toolStripMenuItem3.Size = new System.Drawing.Size(100, 22);
+            this.toolStripMenuItem3.Size = new System.Drawing.Size(108, 24);
             this.toolStripMenuItem3.Text = "退出";
             this.toolStripMenuItem3.Click += new System.EventHandler(this.toolStripMenuItem3_Click);
             // 
@@ -105,12 +107,12 @@
             this.toolStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripButton4,
+            this.toolStripButton1,
             this.toolStripButton5,
-            this.toolStripButton2,
-            this.toolStripButton1});
+            this.toolStripButton2});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(694, 45);
+            this.toolStrip1.Size = new System.Drawing.Size(925, 56);
             this.toolStrip1.TabIndex = 3;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -179,13 +181,13 @@
             this.toolStripMenuItem4,
             this.toolStripMenuItem5});
             this.contextMenuStrip2.Name = "contextMenuStrip2";
-            this.contextMenuStrip2.Size = new System.Drawing.Size(101, 48);
+            this.contextMenuStrip2.Size = new System.Drawing.Size(109, 52);
             this.contextMenuStrip2.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenuStrip2_Opening);
             // 
             // toolStripMenuItem4
             // 
             this.toolStripMenuItem4.Name = "toolStripMenuItem4";
-            this.toolStripMenuItem4.Size = new System.Drawing.Size(100, 22);
+            this.toolStripMenuItem4.Size = new System.Drawing.Size(108, 24);
             this.toolStripMenuItem4.Text = "连接";
             this.toolStripMenuItem4.Click += new System.EventHandler(this.toolStripMenuItem4_Click);
             // 
@@ -193,7 +195,7 @@
             // 
             this.toolStripMenuItem5.Enabled = false;
             this.toolStripMenuItem5.Name = "toolStripMenuItem5";
-            this.toolStripMenuItem5.Size = new System.Drawing.Size(100, 22);
+            this.toolStripMenuItem5.Size = new System.Drawing.Size(108, 24);
             this.toolStripMenuItem5.Text = "断开";
             // 
             // richTextBox1
@@ -201,9 +203,10 @@
             this.richTextBox1.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.richTextBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.richTextBox1.ForeColor = System.Drawing.SystemColors.MenuText;
-            this.richTextBox1.Location = new System.Drawing.Point(0, 45);
+            this.richTextBox1.Location = new System.Drawing.Point(0, 56);
+            this.richTextBox1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(694, 432);
+            this.richTextBox1.Size = new System.Drawing.Size(925, 540);
             this.richTextBox1.TabIndex = 5;
             this.richTextBox1.Text = "";
             this.richTextBox1.Visible = false;
@@ -216,6 +219,14 @@
             this.dataGridView1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dataGridView1.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells;
             this.dataGridView1.BackgroundColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.statusDataGridViewTextBoxColumn,
@@ -226,15 +237,25 @@
             this.bbbDataGridViewTextBoxColumn});
             this.dataGridView1.ContextMenuStrip = this.contextMenuStrip2;
             this.dataGridView1.DataSource = this.jsonConfigItemBindingSource;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dataGridView1.DefaultCellStyle = dataGridViewCellStyle2;
             this.dataGridView1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dataGridView1.Location = new System.Drawing.Point(0, 45);
+            this.dataGridView1.Location = new System.Drawing.Point(0, 56);
+            this.dataGridView1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.dataGridView1.MultiSelect = false;
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.ReadOnly = true;
             this.dataGridView1.RowHeadersVisible = false;
+            this.dataGridView1.RowHeadersWidth = 51;
             this.dataGridView1.RowTemplate.Height = 27;
             this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridView1.Size = new System.Drawing.Size(694, 432);
+            this.dataGridView1.Size = new System.Drawing.Size(925, 540);
             this.dataGridView1.TabIndex = 6;
             this.dataGridView1.RowContextMenuStripNeeded += new System.Windows.Forms.DataGridViewRowContextMenuStripNeededEventHandler(this.dataGridView1_RowContextMenuStripNeeded);
             // 
@@ -245,28 +266,36 @@
             // statusDataGridViewTextBoxColumn
             // 
             this.statusDataGridViewTextBoxColumn.DataPropertyName = "status";
+            this.statusDataGridViewTextBoxColumn.FillWeight = 9.723529F;
             this.statusDataGridViewTextBoxColumn.HeaderText = "status";
+            this.statusDataGridViewTextBoxColumn.MinimumWidth = 3;
             this.statusDataGridViewTextBoxColumn.Name = "statusDataGridViewTextBoxColumn";
             this.statusDataGridViewTextBoxColumn.ReadOnly = true;
             // 
             // nameDataGridViewTextBoxColumn
             // 
             this.nameDataGridViewTextBoxColumn.DataPropertyName = "remarks";
+            this.nameDataGridViewTextBoxColumn.FillWeight = 208.2148F;
             this.nameDataGridViewTextBoxColumn.HeaderText = "name";
+            this.nameDataGridViewTextBoxColumn.MinimumWidth = 6;
             this.nameDataGridViewTextBoxColumn.Name = "nameDataGridViewTextBoxColumn";
             this.nameDataGridViewTextBoxColumn.ReadOnly = true;
             // 
             // serverDataGridViewTextBoxColumn
             // 
             this.serverDataGridViewTextBoxColumn.DataPropertyName = "server";
+            this.serverDataGridViewTextBoxColumn.FillWeight = 128.3422F;
             this.serverDataGridViewTextBoxColumn.HeaderText = "server";
+            this.serverDataGridViewTextBoxColumn.MinimumWidth = 6;
             this.serverDataGridViewTextBoxColumn.Name = "serverDataGridViewTextBoxColumn";
             this.serverDataGridViewTextBoxColumn.ReadOnly = true;
             // 
             // methodDataGridViewTextBoxColumn
             // 
             this.methodDataGridViewTextBoxColumn.DataPropertyName = "method";
+            this.methodDataGridViewTextBoxColumn.FillWeight = 84.57314F;
             this.methodDataGridViewTextBoxColumn.HeaderText = "method";
+            this.methodDataGridViewTextBoxColumn.MinimumWidth = 6;
             this.methodDataGridViewTextBoxColumn.Name = "methodDataGridViewTextBoxColumn";
             this.methodDataGridViewTextBoxColumn.ReadOnly = true;
             // 
@@ -274,27 +303,32 @@
             // 
             this.aaaDataGridViewTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             this.aaaDataGridViewTextBoxColumn.DataPropertyName = "aaa";
+            this.aaaDataGridViewTextBoxColumn.FillWeight = 84.57314F;
             this.aaaDataGridViewTextBoxColumn.HeaderText = "延迟";
+            this.aaaDataGridViewTextBoxColumn.MinimumWidth = 6;
             this.aaaDataGridViewTextBoxColumn.Name = "aaaDataGridViewTextBoxColumn";
             this.aaaDataGridViewTextBoxColumn.ReadOnly = true;
             // 
             // bbbDataGridViewTextBoxColumn
             // 
             this.bbbDataGridViewTextBoxColumn.DataPropertyName = "bbb";
+            this.bbbDataGridViewTextBoxColumn.FillWeight = 84.57314F;
             this.bbbDataGridViewTextBoxColumn.HeaderText = "连接";
+            this.bbbDataGridViewTextBoxColumn.MinimumWidth = 6;
             this.bbbDataGridViewTextBoxColumn.Name = "bbbDataGridViewTextBoxColumn";
             this.bbbDataGridViewTextBoxColumn.ReadOnly = true;
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(694, 477);
+            this.ClientSize = new System.Drawing.Size(925, 596);
             this.Controls.Add(this.richTextBox1);
             this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.toolStrip1);
             this.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "Form1";
             this.Text = "yoke_ss";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);
